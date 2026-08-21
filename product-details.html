@@ -55,11 +55,10 @@
                                 Product
                             </label>
 
-                            <input type="text"
-                                   class="form-control"
-                                   value="Laptop"
-                                   readonly>
-
+                           <input type="text"
+       class="form-control"
+       id="productName"
+       readonly>
                         </div>
 
 
@@ -69,11 +68,10 @@
                             <label class="form-label fw-bold">
                                 GST Rate
                             </label>
-
-                            <input type="text"
-                                   class="form-control"
-                                   value="18% (Automatic)"
-                                   readonly>
+<input type="text"
+       class="form-control"
+       id="productGST"
+       readonly>
 
                             <small class="text-muted">
                                 GST is automatically taken from the
@@ -91,12 +89,10 @@
                                 Price
                             </label>
 
-                            <input type="number"
-                                   class="form-control"
-                                   id="price"
-                                   value="50000"
-                                   min="0">
-
+           <input type="number"
+       class="form-control"
+       id="price"
+       min="0">
                         </div>
 
 
@@ -159,35 +155,34 @@
 
 
                         <!-- Calculation Preview -->
-                        <div class="alert alert-light border">
+     <div class="alert alert-light border">
 
-                            <p class="mb-2">
-                                <strong>Amount:</strong>
-                                ₹50,000
-                            </p>
+    <p class="mb-2">
+        <strong>Amount:</strong>
+        ₹<span id="amount">0</span>
+    </p>
 
-                            <p class="mb-2">
-                                <strong>Discount:</strong>
-                                ₹0
-                            </p>
+    <p class="mb-2">
+        <strong>Discount:</strong>
+        ₹<span id="discountAmount">0</span>
+    </p>
 
-                            <p class="mb-2">
-                                <strong>Taxable Amount:</strong>
-                                ₹50,000
-                            </p>
+    <p class="mb-2">
+        <strong>Taxable Amount:</strong>
+        ₹<span id="taxableAmount">0</span>
+    </p>
 
-                            <p class="mb-2">
-                                <strong>GST Amount:</strong>
-                                ₹9,000
-                            </p>
+    <p class="mb-2">
+        <strong>GST Amount:</strong>
+        ₹<span id="gstAmount">0</span>
+    </p>
 
-                            <p class="mb-0">
-                                <strong>Product Total:</strong>
-                                ₹59,000
-                            </p>
+    <p class="mb-0">
+        <strong>Product Total:</strong>
+        ₹<span id="productTotal">0</span>
+    </p>
 
-                        </div>
-
+</div>
 
                         <!-- Add Button -->
                         <div class="d-grid mt-4">
@@ -210,7 +205,130 @@
         </div>
 
     </div>
+<script src="js/products.js"></script>
+<script src="js/gst.js"></script>
 
+<script>
+
+    // Get product ID from URL
+
+    const urlParams =
+        new URLSearchParams(window.location.search);
+
+    const productId =
+        Number(urlParams.get("id"));
+
+
+    // Find selected product
+
+    const selectedProduct =
+        products.find(function(product) {
+
+            return product.id === productId;
+
+        });
+
+
+    // Check product
+
+    if (selectedProduct) {
+
+        document.getElementById("productName").value =
+            selectedProduct.name;
+
+
+        document.getElementById("productGST").value =
+            selectedProduct.gst + "% (Automatic)";
+
+
+        document.getElementById("price").value =
+            selectedProduct.price;
+
+    }
+
+
+    // Calculate preview
+
+    function updatePreview() {
+
+        const price =
+            Number(document.getElementById("price").value);
+
+
+        const quantity =
+            Number(document.getElementById("quantity").value);
+
+
+        const discount =
+            Number(document.getElementById("discount").value);
+
+
+        const discountType =
+            document.getElementById("discountType").value;
+
+
+        if (!selectedProduct) {
+
+            return;
+
+        }
+
+
+        const result =
+            calculateProductBill(
+                price,
+                quantity,
+                discount,
+                discountType,
+                selectedProduct.gst
+            );
+
+
+        document.getElementById("amount").textContent =
+            result.amount.toFixed(2);
+
+
+        document.getElementById("discountAmount").textContent =
+            result.discount.toFixed(2);
+
+
+        document.getElementById("taxableAmount").textContent =
+            result.taxableAmount.toFixed(2);
+
+
+        document.getElementById("gstAmount").textContent =
+            result.gstAmount.toFixed(2);
+
+
+        document.getElementById("productTotal").textContent =
+            result.total.toFixed(2);
+
+    }
+
+
+    // Update when values change
+
+    document.getElementById("price")
+        .addEventListener("input", updatePreview);
+
+
+    document.getElementById("quantity")
+        .addEventListener("input", updatePreview);
+
+
+    document.getElementById("discount")
+        .addEventListener("input", updatePreview);
+
+
+    document.getElementById("discountType")
+        .addEventListener("change", updatePreview);
+
+
+    // First calculation
+
+    updatePreview();
+
+</script>
 </body>
 
 </html>
